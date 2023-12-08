@@ -1,0 +1,58 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import from_json, col
+from pyspark.sql.types import StructType, StructField, StringType
+
+spark = SparkSession.builder.appName("KafkaToHDFS").getOrCreate()
+
+# Define Kafka parameters
+# Configure Kafka producer parameters
+kafka_params = {
+    "bootstrap.servers": “localhost:9092",
+    "key.serializer": "org.apache.kafka.common.serialization.StringSerializer",
+    "value.serializer": "org.apache.kafka.common.serialization.StringSerializer"
+}
+
+kafka_topic = "events"
+# Define HDFS path for RAW Zone
+hdfs_raw_path = “hdfs://user/data/raw_zone"
+
+# schema definition 
+json_schema = StructType([
+    StructField("events", StructType([
+        StructField("event", StructType([
+            StructField("name", StringType()),
+            StructField("date", StringType()),
+            StructField("sever-details", StructType([
+                StructField("server_id", StringType()),
+                StructField("location", StringType()),
+                StructField("temp", StringType())
+            ]))
+        ]))
+    ]))
+])
+
+# Read data from Kafka in Structured Streaming
+df = spark \
+    .readStream \
+    .format("kafka") \
+    .option(“kafka.bootstrap.servers”,”localhost:9092") \
+    .option("subscribe", events) \
+    .load()
+
+# Convert the value column from Kafka message to a string
+json_data = df.selectExpr("CAST(value AS STRING)")
+
+# Parse JSON data using the specified schema
+parsed_df = json_data.select(from_json("value", json_schema).alias("data")).select("data.*")
+
+# Write the data to HDFS as Parquet in RAW Zone
+query = parsed_df \
+    .writeStream \
+    .outputMode("append") \
+    .format("parquet") \
+    .option("path", hdfs_raw_path) \
+    .option("checkpointLocation", “hdfs://user/checkpoint/“) \
+    .start()
+
+# Wait for the streaming query to finish
+query.awaitTermination()
