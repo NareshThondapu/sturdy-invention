@@ -45,8 +45,22 @@ json_data = df.selectExpr("CAST(value AS STRING)")
 # Parse JSON data using the specified schema
 parsed_df = json_data.select(from_json("value", json_schema).alias("data")).select("data.*")
 
+# Apply Data Validation, Dynamic Data Validation, Schema Validation, Data Type Validation
+validated_df = parsed_df.filter(
+    col("name").isNotNull() &
+    col("date").isNotNull() &
+    col("sever-details.server_id").isNotNull() &
+    col("sever-details.location").isNotNull() &
+    col("sever-details.temp").isNotNull() &
+    col("sever-details.server_id").cast(IntegerType()).isNotNull()
+)
+
+# Apply Data Formatting (Trimming)
+formatted_df = validated_df.withColumn("name", trim(col("name"))).withColumn("date", trim(col("date")))
+
+
 # Write the data to HDFS as Parquet in RAW Zone
-query = parsed_df \
+query = formatted_df \
     .writeStream \
     .outputMode("append") \
     .format("parquet") \
