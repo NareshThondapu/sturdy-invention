@@ -26,10 +26,10 @@ raw_data = spark.read.schema(raw_schema).parquet(hdfs_raw_path)
 # Calculate the timestamp for the current hour - 1
 current_date_minus_1 = current_date() - 1
 
-# Filter data for the last hour
+# Filter data for the last day
 incremental_data = raw_data.filter(unix_timestamp("date") > current_date_minus_1)
 
-# Perform necessary transformations
+
 processed_data = incremental_data.select(
     col("name"),
     col("date"),
@@ -38,7 +38,7 @@ processed_data = incremental_data.select(
     col("sever-details.temp")
 )
 
-# Append or overwrite the processed data in the Processed Zone
+# Append processed data in the Processed Zone
 processed_data.write.mode("append").partitionBy("date").parquet(hdfs_processed_path)
 
 # Stop the Spark Session
