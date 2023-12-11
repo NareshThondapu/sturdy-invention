@@ -1,0 +1,20 @@
+<events>
+  <event>
+    <name>Hitachi</name>
+    <date>07122023</date>
+    <sever-details>
+      <server_id>1</server_id>
+      <location>NY</location>
+	 <temp>90F</temp>
+    </server-details>
+  </event>
+  <event>
+    <name>Hitachi</name>
+    <date>07112023</date>
+    <sever-details>
+      <server_id>2</server_id>
+      <location>NY</location>
+	 <temp>101F</temp>
+    </server-details>
+  </event>  
+</events> 
