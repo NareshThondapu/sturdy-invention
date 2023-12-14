@@ -10,7 +10,8 @@ kafka_params = {
     "bootstrap.servers": “localhost:9092",
     "key.serializer": "org.apache.kafka.common.serialization.StringSerializer",
     "value.serializer": "org.apache.kafka.common.serialization.StringSerializer",
-    "acks":"all"
+    "auto_offset_reset":"earliest",
+    "enable_auto_commit":True,
 }
 
 kafka_topic = "events"
