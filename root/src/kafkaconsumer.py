@@ -9,7 +9,8 @@ spark = SparkSession.builder.appName("KafkaToHDFS").getOrCreate()
 kafka_params = {
     "bootstrap.servers": “localhost:9092",
     "key.serializer": "org.apache.kafka.common.serialization.StringSerializer",
-    "value.serializer": "org.apache.kafka.common.serialization.StringSerializer"
+    "value.serializer": "org.apache.kafka.common.serialization.StringSerializer",
+    "acks":"all"
 }
 
 kafka_topic = "events"
