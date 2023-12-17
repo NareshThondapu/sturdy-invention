@@ -23,8 +23,9 @@ raw_schema = StructType([
 # Read data from RAW Zone
 raw_data = spark.read.schema(raw_schema).parquet(hdfs_raw_path)
 
-# Calculate the timestamp for the current hour - 1
-current_date_minus_1 = current_date() - 1
+# Calculate the previous date
+current_date = datetime.now()
+current_date_minus_1 = current_date - timedelta(days=1)
 
 # Filter data for the last day
 incremental_data = raw_data.filter(unix_timestamp("date") > current_date_minus_1)
