@@ -13,7 +13,7 @@ APP_JAR=/user/programs/batch-app.jar
 LOG_DIR=/user/data/logs/batch-app
 
 # Define date for today
-TODAY=$(date -d "today" +%Y-%m-%d)
+CURRENT_DATETIME=$(date "+%Y-%m-%d %H:%M:%S")
 
 # Build the Spark submit command
 spark_submit_cmd="$SPARK_HOME/bin/spark-submit \
@@ -25,7 +25,7 @@ spark_submit_cmd="$SPARK_HOME/bin/spark-submit \
     --num-executors 4 \
     --files /path/to/configuration.yaml \
     --class com.example.batch-app \
-    $APP_JAR $TODAY $LOG_DIR"
+    $APP_JAR $CURRENT_DATETIME $LOG_DIR"
 
 # Run the Spark application
 eval $spark_submit_cmd
